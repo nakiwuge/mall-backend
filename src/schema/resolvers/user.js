@@ -45,7 +45,7 @@ const Validate =(args)=>{
     throw new Error ('Passwords do not match');
   }
   if (password.trim().length<6 ){
-    throw new Error ('Password should have a minimum of 8 characters');
+    throw new Error ('Password should have a minimum of 6 characters');
   }
   if (password.trim().length>40 || firstName.trim().length>40 || lastName.trim().length>40 ||email.trim().length>50 ){
     throw new Error ('fields should have a maximum of 40 characters');
@@ -55,7 +55,7 @@ const Validate =(args)=>{
   }
 };
 
-const sendEmail =(result,args, req)=>{
+const sendEmail =(result,args, req )=>{
   const smtpTransport = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
@@ -66,9 +66,8 @@ const sendEmail =(result,args, req)=>{
 
   const secretKey  = process.env.SECRET_KEY;/* eslint-disable-line no-undef */
 
-  jwt.sign({ userId:result.id }, secretKey, { expiresIn: '24h' }, (err,token)=>{
-
-    const  link = args.host? `https://${args.host}/verify/${token}` :`http://${req.headers.host}/verify/${token}`;
+  jwt.sign({ userId:result.id }, secretKey, { expiresIn: '24h' }, async(err,token)=>{
+    const  link = args.host? `${args.host}/verify/${token}` :`http://${req.headers.host}/verify/${token}`;
 
     const  mailOptions={
       to : result.email,
@@ -79,7 +78,7 @@ const sendEmail =(result,args, req)=>{
                     <br><a href=${link}>Click here to verify</a>`
     };
 
-    smtpTransport.sendMail(mailOptions, (error, response)=>{
+    await smtpTransport.sendMail(mailOptions, (error, response)=>{
       if(error){
         throw new Error(error);
       }

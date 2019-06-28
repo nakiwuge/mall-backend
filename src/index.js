@@ -4,6 +4,7 @@ import  mongoose from 'mongoose';
 import schema from './schema';
 import bodyPaser from 'body-parser';
 import  dotenv from  'dotenv';
+import cors from 'cors';
 /* eslint-disable import/first */
 dotenv.config();
 
@@ -13,6 +14,8 @@ const startServer = async ()=>{
   const app = express();
 
   app.use(bodyPaser.json());
+
+  app.use(cors());
 
   /* eslint-disable-next-line no-undef */
   await  mongoose.connect(process.env.DB_URL, { useNewUrlParser: true }, (err)=>{ /* eslint-disable no-undef */

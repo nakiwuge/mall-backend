@@ -1,7 +1,7 @@
 const graphql = require('graphql');/* eslint-disable-line no-undef */
-import { userArgs, addUser, UserType, LoginType, authArgs, loginUser } from './resolvers/user';
+import { userArgs, addUser, UserType, LoginType, authArgs, loginUser,   } from './resolvers/user';
 import User from '../models/user';
-import { verifyUser, VerifyType } from './resolvers/verify';
+import { verifyUser, VerifyType, forgotPassword, sendPasswordEmail, forgotPasswordType, } from './resolvers/verify';
 
 const {
   GraphQLObjectType,
@@ -28,6 +28,20 @@ const Mutation = new GraphQLObjectType({
       args: { token: { type: new GraphQLNonNull(GraphQLString) } },
       resolve(parent,args){
         return verifyUser(args);
+      }
+    },
+    sendPasswordEmail: {
+      type: forgotPasswordType,
+      args: { email: { type: new GraphQLNonNull(GraphQLString) } },
+      resolve(parent,args, req){
+        return sendPasswordEmail(args, req);
+      }
+    },
+    changePassword: {
+      type: forgotPasswordType,
+      args: { password: { type: new GraphQLNonNull(GraphQLString) }, confirmPassword: { type: new GraphQLNonNull(GraphQLString) }, token: { type: new GraphQLNonNull(GraphQLString) } },
+      resolve(parent,args){
+        return forgotPassword(args);
       }
     },
   })
@@ -64,4 +78,5 @@ const schema = new GraphQLSchema({
   mutation: Mutation
 
 });
+
 export default schema;
