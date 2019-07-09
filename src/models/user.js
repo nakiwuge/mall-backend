@@ -7,7 +7,10 @@ const userSchema = new Schema({
   email: String,
   phoneNumber: Number,
   password: String,
-  isVerified: Boolean
+  isVerified: Boolean,
+  createdAt: String ,
+  updatedAt: String,
+  role: String
 });
 
 const User = mongoose.model('User', userSchema);

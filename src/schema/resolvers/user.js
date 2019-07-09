@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcrypt';
 import User from '../../models/user';
+import { RoleType, roleExists } from './roles';
+import Role from '../../models/role';
 
 const {
   GraphQLObjectType,
@@ -23,6 +25,14 @@ export const UserType = new GraphQLObjectType({
     password: { type: GraphQLString },
     confirmPassword: { type: GraphQLString },
     isVerified: { type: GraphQLBoolean },
+    createdAt:   { type: GraphQLString },
+    updatedAt:  { type: GraphQLString },
+    role: {
+      type:RoleType,
+      resolve(parent, args){
+        return Role.findOne({ id: parent.role });
+      }
+    },
     host:{ type: GraphQLString }
   })
 });
@@ -34,8 +44,11 @@ export const userArgs = {
   phoneNumber: { type: new GraphQLNonNull(GraphQLString) },
   password: { type: new GraphQLNonNull(GraphQLString) },
   confirmPassword: { type: new GraphQLNonNull(GraphQLString) },
+  role: { type: new GraphQLNonNull(GraphQLString) },
   isVerified: { type: GraphQLBoolean },
-  host:{ type: GraphQLString }
+  host:{ type: GraphQLString },
+  createdAt:  { type: GraphQLString },
+  updatedAt:  { type: GraphQLString },
 };
 
 const Validate =(args)=>{
@@ -95,6 +108,9 @@ export const addUser =  async (args ,req)=> {
       if (user){
         throw new Error('Email already exists');
       }
+      
+      await  roleExists(args.role);
+
       const hashed = await bcrypt.hash(args.password, 12);
 
       if(hashed){
@@ -104,7 +120,10 @@ export const addUser =  async (args ,req)=> {
           email: args.email,
           phoneNumber: args.phoneNumber,
           password: hashed,
-          isVerified: false
+          isVerified: false,
+          roleId: args.role,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
         const result  = await user.save();
         result.password=null;

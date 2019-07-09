@@ -45,7 +45,7 @@ export const verifyUser =  async (args)=> {
 export const forgotPasswordType = new GraphQLObjectType({
   name: 'forgotPassword',
   fields: () => ({
-    user:{ type: GraphQLString }
+    user:{ type: GraphQLString },
   })
 });
 
@@ -105,7 +105,7 @@ export const sendPasswordEmail = async(args, req)=>{
     throw new Error('Something went wrong please try again later');
   }
 
-  const  link = args.host? `${args.host}/verify/${token}` :`http://${req.headers.host}/verify/${token}`;
+  const  link = args.host? `${args.host}/reset-password/${token}` :`http://${req.headers.host}/verify/${token}`;
   const  mailOptions={
     to : user.email,
     subject : 'Katale Password Reset',

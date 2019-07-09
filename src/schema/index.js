@@ -2,6 +2,8 @@ const graphql = require('graphql');/* eslint-disable-line no-undef */
 import { userArgs, addUser, UserType, LoginType, authArgs, loginUser,   } from './resolvers/user';
 import User from '../models/user';
 import { verifyUser, VerifyType, forgotPassword, sendPasswordEmail, forgotPasswordType, } from './resolvers/verify';
+import Role from '../models/role';
+import { RoleType, addRole } from './resolvers/roles';
 
 const {
   GraphQLObjectType,
@@ -30,18 +32,18 @@ const Mutation = new GraphQLObjectType({
         return verifyUser(args);
       }
     },
-    sendPasswordEmail: {
-      type: forgotPasswordType,
-      args: { email: { type: new GraphQLNonNull(GraphQLString) } },
-      resolve(parent,args, req){
-        return sendPasswordEmail(args, req);
-      }
-    },
     changePassword: {
       type: forgotPasswordType,
       args: { password: { type: new GraphQLNonNull(GraphQLString) }, confirmPassword: { type: new GraphQLNonNull(GraphQLString) }, token: { type: new GraphQLNonNull(GraphQLString) } },
       resolve(parent,args){
         return forgotPassword(args);
+      }
+    },
+    addRole: {
+      type: RoleType,
+      args: { name: { type: new GraphQLNonNull(GraphQLString) }, createdAt: { type: GraphQLString }, updatedAt: { type: GraphQLString } },
+      resolve(parent,args){
+        return addRole(args);
       }
     },
   })
@@ -69,7 +71,29 @@ const RootQuery = new GraphQLObjectType({
       resolve(parent,args){
         return loginUser(args);
       }
-    }
+    },
+    sendPasswordEmail: {
+      type: forgotPasswordType,
+      args: { email: { type: new GraphQLNonNull(GraphQLString) },
+        host: { type: GraphQLString } },
+      resolve(parent,args, req){
+        return sendPasswordEmail(args, req);
+      }
+    },
+
+    roles:{
+      type: new GraphQLList(RoleType),
+      resolve(){
+        return Role.find({});
+      }
+    },
+    role:{
+      type: RoleType,
+      args: { id: { type: GraphQLID } },
+      resolve(parent,args){
+        return Role.findById(args.id);
+      }
+    },
   }
 });
 
