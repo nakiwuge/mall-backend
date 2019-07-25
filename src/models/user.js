@@ -10,7 +10,13 @@ const userSchema = new Schema({
   isVerified: Boolean,
   createdAt: String ,
   updatedAt: String,
-  role: String
+  role: String,
+  stores: [
+    { type: Schema.Types.ObjectId, ref:'Store' }
+  ],
+  categories: [
+    { type: Schema.Types.ObjectId, ref:'StoreCategory' }
+  ]
 });
 
 const User = mongoose.model('User', userSchema);

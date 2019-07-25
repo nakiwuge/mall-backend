@@ -5,13 +5,16 @@ import bcrypt from 'bcrypt';
 import User from '../../models/user';
 import { RoleType, roleExists } from './roles';
 import Role from '../../models/role';
+import { StoreType } from './store';
+import { StoreCategoryType } from './storeCategory';
 
 const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLID,
   GraphQLNonNull,
-  GraphQLBoolean
+  GraphQLBoolean,
+  GraphQLList
 } = graphql;
 
 export const UserType = new GraphQLObjectType({
@@ -27,10 +30,12 @@ export const UserType = new GraphQLObjectType({
     isVerified: { type: GraphQLBoolean },
     createdAt:   { type: GraphQLString },
     updatedAt:  { type: GraphQLString },
+    stores: { type: new GraphQLList(StoreType) },
+    categories: { type: new GraphQLList(StoreCategoryType) },
     role: {
       type:RoleType,
       resolve(parent, args){
-        return Role.findOne({ id: parent.role });
+        return Role.findOne({ _id: parent.role });
       }
     },
     host:{ type: GraphQLString }
@@ -108,7 +113,7 @@ export const addUser =  async (args ,req)=> {
       if (user){
         throw new Error('Email already exists');
       }
-      
+
       await  roleExists(args.role);
 
       const hashed = await bcrypt.hash(args.password, 12);
@@ -121,7 +126,7 @@ export const addUser =  async (args ,req)=> {
           phoneNumber: args.phoneNumber,
           password: hashed,
           isVerified: false,
-          roleId: args.role,
+          role: args.role,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -165,11 +170,14 @@ export const loginUser =async (args)=>{
   if (!user){
     throw new Error('Wrong email or password');
   }
+
   const isEqual = await bcrypt.compare(args.password, user.password);
 
   if (!isEqual){
     throw new Error('Wrong email or password');
   }
+
+  user.password = null;
 
   const token = await jwt.sign({ userId:user.id, email:user.email, firstName:user.firstName }, secretKey, { expiresIn: '24h' });
   return { token , user };

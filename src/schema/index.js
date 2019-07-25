@@ -4,6 +4,12 @@ import User from '../models/user';
 import { verifyUser, VerifyType, forgotPassword, sendPasswordEmail, forgotPasswordType, } from './resolvers/verify';
 import Role from '../models/role';
 import { RoleType, addRole } from './resolvers/roles';
+import { addStoreCategory, StoreCategoryType, storeCategoryArgs,  } from './resolvers/storeCategory';
+import StoreCategory from '../models/StoreCategory';
+import { store, addStoreMutation, stores, updateStoreMutation, deleteStoreMutation } from './mutationsQueries/store';
+import { updateStoreCategoryMutation, deleteStoreCategoryMutation } from './mutationsQueries/storeCategory';
+import { getUser } from '../helpers/user';
+import { getStoreCategory } from '../helpers/store';
 
 const {
   GraphQLObjectType,
@@ -12,12 +18,12 @@ const {
   GraphQLID,
   GraphQLList,
   GraphQLNonNull,
-
 } = graphql;
 
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
+
     addUser: {
       type: UserType,
       args: userArgs,
@@ -46,6 +52,25 @@ const Mutation = new GraphQLObjectType({
         return addRole(args);
       }
     },
+
+    addStoreCategory: {
+      type: StoreCategoryType,
+      args: storeCategoryArgs,
+      resolve(parent,args,req){
+        if(!req.isAuth){
+          throw new Error('not authenticated');
+        }
+        if(req.role === 'superAdmin' || req.role === 'admin'){
+          return addStoreCategory(args,req);
+        }
+        throw new Error('not authorized');
+      }
+    },
+    addStore: addStoreMutation,
+    updateStore: updateStoreMutation,
+    deleteStore: deleteStoreMutation,
+    updateStoreCategory: updateStoreCategoryMutation,
+    deleteStoreCategory: deleteStoreCategoryMutation,
   })
 });
 
@@ -55,14 +80,20 @@ const RootQuery = new GraphQLObjectType({
     user:{
       type: UserType,
       args: { id: { type: GraphQLID } },
-      resolve(parent,args){
-        return User.findById(args.id);
+      async resolve(parent,args){
+        const user = await getUser(args.id);
+        user.password= null;
+        return user;
       }
     },
     users:{
       type: new GraphQLList(UserType),
-      resolve(){
-        return User.find({});
+      async resolve(){
+        const users = await User.find().populate('stores');
+        await users.map((user)=>{
+          user.password = null;
+        });
+        return users;
       }
     },
     login: {
@@ -84,7 +115,7 @@ const RootQuery = new GraphQLObjectType({
     roles:{
       type: new GraphQLList(RoleType),
       resolve(){
-        return Role.find({});
+        return Role.find();
       }
     },
     role:{
@@ -94,13 +125,28 @@ const RootQuery = new GraphQLObjectType({
         return Role.findById(args.id);
       }
     },
+    storeCategories:{
+      type: new GraphQLList(StoreCategoryType),
+      async resolve(){
+
+        return StoreCategory.find().populate('createdBy', '-password').populate('stores');
+      }
+    },
+    storeCategory:{
+      type: StoreCategoryType,
+      args: { id: { type: GraphQLID } },
+      resolve(parent, args){
+        return getStoreCategory(args.id);
+      }
+    },
+    stores,
+    store,
   }
 });
 
 const schema = new GraphQLSchema({
   query: RootQuery,
   mutation: Mutation
-
 });
 
 export default schema;
