@@ -22,13 +22,10 @@
   },
   "homepage": "https://github.com/zellymiriam/mall-backend#readme",
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/node": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
     "eslint": "^5.16.0",
     "nodemon": "^1.19.1"
   },
+
   "dependencies": {
     "apollo-upload-server": "^7.1.0",
     "bcrypt": "^3.0.6",
@@ -44,6 +41,10 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.5.14",
     "multer": "^1.4.1",
-    "nodemailer": "^6.2.1"
+    "nodemailer": "^6.2.1",
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/preset-env": "^7.4.5"
   }
 }
