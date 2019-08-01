@@ -126,7 +126,7 @@ export const addUser =  async (args ,req)=> {
           phoneNumber: args.phoneNumber,
           password: hashed,
           isVerified: false,
-          role: args.role,
+          roleId: args.role,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
