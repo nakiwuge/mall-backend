@@ -10,7 +10,7 @@ const userSchema = new Schema({
   isVerified: Boolean,
   createdAt: String ,
   updatedAt: String,
-  role: String,
+roleId: String,
   stores: [
     { type: Schema.Types.ObjectId, ref:'Store' }
   ],
