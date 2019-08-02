@@ -6,6 +6,7 @@ import { StoreCategoryType } from './storeCategory';
 import { getStoreCategory, getStore } from '../../helpers/store';
 import User from '../../models/user';
 import StoreCategory from '../../models/StoreCategory';
+import deleteFile from '../../helpers/deleteFile';
 
 const {
   GraphQLObjectType,
@@ -72,7 +73,7 @@ export const updateStore = async(args,req)=>{
   const user = await getUser(req.user.userId);
   const store = await getStore(args.id);
 
-  if (user.id != store.owner){
+  if (user.id != store.owner.id){
 
     throw new Error('Not authorized');
   }
@@ -96,7 +97,7 @@ export const deleteStore = async(args,req)=>{
   const user = await getUser(req.user.userId);
   const store = await getStore(args.id);
 
-  if (user.id != store.owner){
+  if (user.id != store.owner.id){
     throw new Error('Not authorized');
   }
 
@@ -106,6 +107,9 @@ export const deleteStore = async(args,req)=>{
     }
 
     store.remove();
+    if(store.imageUrl!=='null'){
+      deleteFile(store.imageUrl);
+    }
 
     await User.updateOne({ _id:user.id },{ $pull: { stores: { $in: [ args.id ] } } });
     await StoreCategory.updateOne({ _id:store.category },{ $pull: { stores: { $in: [ args.id ] } } });
