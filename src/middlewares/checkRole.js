@@ -15,7 +15,6 @@ const checkRole = async (req,res,next)=>{
   }
 
   const result = await Role.findOne({ _id:user.role });
-
   if(!result){
     req.userRole=null;
     return next();

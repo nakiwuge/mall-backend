@@ -10,6 +10,19 @@ import { store, addStoreMutation, stores, updateStoreMutation, deleteStoreMutati
 import { updateStoreCategoryMutation, deleteStoreCategoryMutation } from './mutationsQueries/storeCategory';
 import { getUser } from '../helpers/user';
 import { getStoreCategory } from '../helpers/store';
+import {
+  itemCategories,
+  addItemCategoryMutation,
+  itemCategory,
+  updateItemCategoryMutation,
+  deleteItemCategoryMutation,
+} from './mutationsQueries/itemCategory';
+import { items,
+  addItemMutation,
+  item,
+  updateItemMutation,
+  deleteItemMutation
+} from './mutationsQueries/item';
 
 const {
   GraphQLObjectType,
@@ -71,6 +84,13 @@ const Mutation = new GraphQLObjectType({
     deleteStore: deleteStoreMutation,
     updateStoreCategory: updateStoreCategoryMutation,
     deleteStoreCategory: deleteStoreCategoryMutation,
+    //items
+    addItemCategory:addItemCategoryMutation,
+    updateItemCategory:updateItemCategoryMutation,
+    deleteItemCategory:deleteItemCategoryMutation,
+    addItem:addItemMutation,
+    updateItem:updateItemMutation,
+    deleteItem:deleteItemMutation
   })
 });
 
@@ -141,6 +161,10 @@ const RootQuery = new GraphQLObjectType({
     },
     stores,
     store,
+    itemCategories,
+    itemCategory,
+    items,
+    item
   }
 });
 
