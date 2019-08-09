@@ -4,6 +4,7 @@ import { getUser } from '../../helpers/user';
 import { UserType } from './user';
 import { StoreType } from './store';
 import { getStoreCategory } from '../../helpers/store';
+import { titleCase } from '../../helpers/formatData';
 
 const {
   GraphQLObjectType,
@@ -34,13 +35,13 @@ export const storeCategoryArgs = {
 
 export const addStoreCategory = async(args,req)=>{
   const user = await getUser(req.user.userId);
-  const storeCategory = await StoreCategory.findOne({ name: args.name });
+  const storeCategory = await StoreCategory.findOne({ name: await titleCase(args.name) });
   if(storeCategory){
     throw new Error('Category already exists');
   }
 
   const category = new StoreCategory({
-    name: args.name,
+    name: await titleCase(args.name),
     createdBy:user.id,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -60,18 +61,18 @@ export const updateStoreCategory = async(args,req)=>{
   const user = await getUser(req.user.userId);
   const category = await getStoreCategory(args.id);
 
-  if (user.id != category.createdBy){
+  if (user.id != category.createdBy.id){
 
     throw new Error('Not authorized');
   }
-  const categoryExists = await StoreCategory.findOne({ name: args.name });
+  const categoryExists = await StoreCategory.findOne({ name: await titleCase(args.name) });
 
   if(categoryExists){
     throw new Error('Category already exists');
   }
 
   return StoreCategory.findByIdAndUpdate(args.id, {
-    $set:{ name: args.name,updatedAt: new Date() } },
+    $set:{ name: await titleCase(args.name),updatedAt: new Date() } },
   { new:true,useFindAndModify: false }, ( err,category)=>{
     if (err){
       throw new Error(err);
@@ -85,7 +86,7 @@ export const deleteStoreCategory = async(args,req)=>{
   const user = await getUser(req.user.userId);
   const category = await getStoreCategory(args.id);
 
-  if (user.id != category.createdBy){
+  if (user.id != category.createdBy.id){
     throw new Error('Not authorized');
   }
 

@@ -7,6 +7,7 @@ const storeSchema = new Schema({
   owner: { type: Schema.Types.ObjectId, ref:'User' },
   description: String,
   category:{ type: Schema.Types.ObjectId, ref:'StoreCategory' },
+  items: [{ type: Schema.Types.ObjectId, ref:'Item' }],
   imageUrl: String,
   createdAt: String ,
   updatedAt: String,

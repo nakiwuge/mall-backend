@@ -29,7 +29,8 @@ export const stores = {
   type: new GraphQLList(StoreType),
   resolve(){
     return Store.find().populate('owner', '-password')
-      .populate('category');
+      .populate('category')
+      .populate('items');
   }
 };
 export const store = {

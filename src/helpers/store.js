@@ -14,7 +14,8 @@ export const getStoreCategory = async (id)=>{
 
 export const getStore = async (id)=>{
   const store = await Store.findById(id).populate('owner', '-password')
-    .populate('category');
+    .populate('category')
+    .populate('items');
 
   if(!store ){
     throw new Error('Store not found');
