@@ -7,12 +7,14 @@ import { getStoreCategory, getStore } from '../../helpers/store';
 import User from '../../models/user';
 import StoreCategory from '../../models/StoreCategory';
 import deleteFile from '../../helpers/deleteFile';
+import { ItemType } from './item';
 
 const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLID,
   GraphQLNonNull,
+  GraphQLList
 } = graphql;
 
 export const StoreType = new GraphQLObjectType({
@@ -21,6 +23,7 @@ export const StoreType = new GraphQLObjectType({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
     owner: { type: UserType },
+    items:  { type: new GraphQLList(ItemType) },
     category: { type: StoreCategoryType },
     description: { type: GraphQLString },
     imageUrl: { type: GraphQLString },
