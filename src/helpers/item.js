@@ -22,3 +22,13 @@ export const getItem = async (id)=>{
 
   return item ;
 };
+
+export const currency = (string)=>{
+  const toNumber = parseInt(string.replace(/\D/g, ''));
+
+  if(isNaN(toNumber)){
+    return '';
+  }
+
+  return toNumber.toLocaleString();
+};

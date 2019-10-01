@@ -5,7 +5,7 @@ const fileUpload = async(req, res)=>{
   if(req.file){
     const file = dataUri(req).content;
     const result = await uploader.upload(file);
-    
+
     if (!result){
       return res.status(400).send({ message:'failed' });
     }
@@ -20,7 +20,3 @@ const fileUpload = async(req, res)=>{
 
 };
 export default fileUpload;
-
-
-
-

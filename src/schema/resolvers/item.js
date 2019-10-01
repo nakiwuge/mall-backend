@@ -5,7 +5,7 @@ import { getStore } from '../../helpers/store';
 import deleteFile from '../../helpers/deleteFile';
 import { StoreType } from './store';
 import { ItemCategoryType } from './itemCategory';
-import { getItemCategory, getItem } from '../../helpers/item';
+import { getItemCategory, getItem, currency } from '../../helpers/item';
 import Item from '../../models/items';
 import { titleCase, capitalize } from '../../helpers/formatData';
 import ItemCategory from '../../models/itemCategory';
@@ -62,7 +62,7 @@ export const addItem  = async(args,req)=>{
     store: store.id,
     category: category.id,
     description: capitalize(args.description),
-    price:args.price,
+    price:currency(args.price),
     negotiable:args.negotiable,
     imageUrl: args.imageUrl,
     createdAt: new Date(),
@@ -82,7 +82,6 @@ export const addItem  = async(args,req)=>{
 export const updateItem = async(args,req)=>{
   const user = await getUser(req.user.userId);
   const item = await  getItem(args.id);
-  await getItemCategory(args.category);
 
   if (user.id != item.store.owner){
     throw new Error('Not authorized');
@@ -92,7 +91,7 @@ export const updateItem = async(args,req)=>{
     $set:{ name:await titleCase(args.name),
       category: args.category,
       description: capitalize(args.description),
-      price:args.price,
+      price:currency(args.price),
       negotiable:args.negotiable,
       imageUrl: args.imageUrl,
       updatedAt: new Date() } },
@@ -100,9 +99,11 @@ export const updateItem = async(args,req)=>{
     if (err){
       throw new Error(err);
     }
+
     return item;
   }
-  );
+  ).populate('store')
+    .populate('category');
 };
 
 export const deleteItem= async(args,req)=>{

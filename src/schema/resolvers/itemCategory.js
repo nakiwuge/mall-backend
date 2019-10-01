@@ -35,7 +35,7 @@ export const itemCategoryArgs = {
 
 export const addItemCategory = async(args,req)=>{
   const user = await getUser(req.user.userId);
-  const itemCategory = await ItemCategory.findOne({ name: args.name });
+  const itemCategory = await ItemCategory.findOne({ name: await titleCase(args.name)});
 
   if(itemCategory){
     throw new Error('Category already exists');
@@ -57,7 +57,7 @@ export const addItemCategory = async(args,req)=>{
 
 export const updateItemCategory = async(args,req)=>{
 
-  const categoryExists = await ItemCategory.findOne({ name: args.name });
+  const categoryExists = await ItemCategory.findOne({ name: await titleCase(args.name)});
 
   if(categoryExists){
     throw new Error('Category already exists');
