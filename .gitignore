@@ -2,5 +2,6 @@ node_modules/
 package-lock.json
 .env
 .nyc_output/
+env_variables.yaml
 
 
